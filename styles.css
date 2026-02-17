@@ -9,7 +9,8 @@
     --bg: #0a0a0b;
     --bg-secondary: #111113;
     --bg-tertiary: #1a1a1e;
-    --surface: #16161a;
+    --surface: rgba(22, 22, 26, 0.6);
+    --surface-solid: #16161a;
     --border: rgba(255, 255, 255, 0.06);
     --border-hover: rgba(255, 255, 255, 0.12);
     --text: #e8e8ec;
@@ -109,15 +110,19 @@ button {
     background-size: 256px 256px;
 }
 
-/* ==================== PARTICLE CANVAS ==================== */
-#particleCanvas {
+/* ==================== MESH GRADIENT CANVAS ==================== */
+#gradient-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none;
     z-index: 0;
+    opacity: 0.6;
+    --gradient-color-1: #4c3bcf;
+    --gradient-color-2: #7b2ff7;
+    --gradient-color-3: #1a8aff;
+    --gradient-color-4: #6c63ff;
 }
 
 /* ==================== CUSTOM CURSOR ==================== */
@@ -834,6 +839,8 @@ button {
 
 .stat-card {
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 28px 24px;
@@ -915,6 +922,8 @@ button {
 
 .whatido-card {
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 36px 32px;
@@ -1035,6 +1044,8 @@ button {
 
 .tech-logo-item:hover {
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-color: var(--border);
     transform: translateY(-6px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -1200,6 +1211,8 @@ button {
     justify-content: center;
     transition: all 0.6s ease;
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .lifecycle-merge.active {
@@ -1402,6 +1415,8 @@ button {
 
 .timeline-content {
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 32px;
@@ -1523,6 +1538,8 @@ button {
 
 .project-card {
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 40px;
@@ -1727,7 +1744,9 @@ button {
     z-index: 1;
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
-    background: var(--bg-secondary);
+    background: rgba(17, 17, 19, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .achievements-grid {
@@ -1790,6 +1809,8 @@ button {
 
 .education-card {
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 36px;
@@ -1954,6 +1975,8 @@ button {
 
 .contact-info-card {
     background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 40px;
