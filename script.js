@@ -927,5 +927,227 @@ function initTypingEffect() {
     requestAnimationFrame(checkFPS);
 })();
 
+// ==================== PROJECT CAROUSEL + ZOOM LIGHTBOX ====================
+(function initGalleries() {
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox) return;
+
+    const EASE = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+    const lbImg = lightbox.querySelector('.lightbox-img');
+    const lbVideo = lightbox.querySelector('.lightbox-video');
+    const lbCounter = lightbox.querySelector('.lightbox-counter');
+    const lbClose = lightbox.querySelector('.lightbox-close');
+    const lbPrev = lightbox.querySelector('.lightbox-nav--prev');
+    const lbNext = lightbox.querySelector('.lightbox-nav--next');
+    const lbStage = lightbox.querySelector('.lightbox-stage');
+    const lbBackdrop = lightbox.querySelector('.lightbox-backdrop');
+
+    const MIN_SCALE = 1;
+    const MAX_SCALE = 4;
+    let lbImages = [];
+    let lbIndex = 0;
+    let scale = 1;
+    let tx = 0, ty = 0;
+    let startTx = 0, startTy = 0;
+
+    function applyTransform() {
+        lbImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    }
+
+    function clampPan() {
+        const rect = lbStage.getBoundingClientRect();
+        const maxX = (rect.width * (scale - 1)) / 2;
+        const maxY = (rect.height * (scale - 1)) / 2;
+        tx = Math.max(-maxX, Math.min(maxX, tx));
+        ty = Math.max(-maxY, Math.min(maxY, ty));
+    }
+
+    function resetZoom() {
+        scale = 1; tx = 0; ty = 0;
+        lbImg.classList.remove('is-zoomed', 'is-panning');
+        lbImg.style.transition = EASE;
+        applyTransform();
+    }
+
+    function toggleZoom(e) {
+        if (scale > 1) { resetZoom(); return; }
+        scale = 2.2;
+        lbImg.classList.add('is-zoomed');
+        lbImg.style.transition = EASE;
+        const rect = lbImg.getBoundingClientRect();
+        const cx = e.clientX - (rect.left + rect.width / 2);
+        const cy = e.clientY - (rect.top + rect.height / 2);
+        tx = -cx * (scale - 1);
+        ty = -cy * (scale - 1);
+        clampPan();
+        applyTransform();
+    }
+
+    function showImage(i) {
+        lbIndex = (i + lbImages.length) % lbImages.length;
+        const data = lbImages[lbIndex];
+        const isVideo = data.type === 'video';
+        lightbox.classList.toggle('is-video', isVideo);
+        if (isVideo) {
+            lbImg.removeAttribute('src');
+            if (lbVideo.src !== data.src) lbVideo.src = data.src;
+            lbVideo.currentTime = 0;
+            lbVideo.play().catch(() => {});
+        } else {
+            lbVideo.pause();
+            lbImg.src = data.src;
+            lbImg.alt = data.alt || '';
+        }
+        lbCounter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
+        resetZoom();
+    }
+
+    function openLightbox(images, index) {
+        lbImages = images;
+        lightbox.classList.toggle('is-single', images.length < 2);
+        lightbox.classList.add('is-open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lightbox-open');
+        showImage(index);
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('is-open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('lightbox-open');
+        lbVideo.pause();
+    }
+
+    // Lightbox controls
+    lbClose.addEventListener('click', closeLightbox);
+    lbBackdrop.addEventListener('click', closeLightbox);
+    lbPrev.addEventListener('click', () => showImage(lbIndex - 1));
+    lbNext.addEventListener('click', () => showImage(lbIndex + 1));
+
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowRight') showImage(lbIndex + 1);
+        else if (e.key === 'ArrowLeft') showImage(lbIndex - 1);
+    });
+
+    // Wheel to zoom
+    lbStage.addEventListener('wheel', (e) => {
+        if (lightbox.classList.contains('is-video')) return;
+        e.preventDefault();
+        const next = scale + (-e.deltaY * 0.0015) * scale;
+        scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, next));
+        if (scale <= 1.01) { resetZoom(); return; }
+        lbImg.classList.add('is-zoomed');
+        lbImg.style.transition = 'none';
+        clampPan();
+        applyTransform();
+    }, { passive: false });
+
+    // Click to toggle zoom / drag to pan
+    let lbDown = false, lbMoved = false, lbSX = 0, lbSY = 0;
+    lbImg.addEventListener('pointerdown', (e) => {
+        lbDown = true; lbMoved = false;
+        lbSX = e.clientX; lbSY = e.clientY;
+        startTx = tx; startTy = ty;
+        if (scale > 1) {
+            lbImg.classList.add('is-panning');
+            lbImg.style.transition = 'none';
+        }
+        if (lbImg.setPointerCapture) lbImg.setPointerCapture(e.pointerId);
+    });
+    lbImg.addEventListener('pointermove', (e) => {
+        if (!lbDown) return;
+        const dx = e.clientX - lbSX;
+        const dy = e.clientY - lbSY;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) lbMoved = true;
+        if (scale > 1) {
+            tx = startTx + dx;
+            ty = startTy + dy;
+            clampPan();
+            applyTransform();
+        }
+    });
+    lbImg.addEventListener('pointerup', (e) => {
+        if (!lbDown) return;
+        lbDown = false;
+        lbImg.classList.remove('is-panning');
+        if (!lbMoved) toggleZoom(e);
+        else lbImg.style.transition = EASE;
+    });
+
+    // Wire each project gallery
+    document.querySelectorAll('[data-gallery]').forEach((gallery) => {
+        const track = gallery.querySelector('.carousel-track');
+        const slides = Array.from(track.children).filter((el) => el.tagName === 'IMG' || el.tagName === 'VIDEO');
+        if (!slides.length) return;
+
+        const prev = gallery.querySelector('.carousel-arrow--prev');
+        const next = gallery.querySelector('.carousel-arrow--next');
+        const zoomBtn = gallery.querySelector('.carousel-zoom');
+        const dotsWrap = gallery.querySelector('.carousel-dots');
+        const counter = gallery.querySelector('.carousel-count');
+        const images = slides.map((el) => el.tagName === 'VIDEO'
+            ? { type: 'video', src: el.currentSrc || el.src }
+            : { type: 'image', src: el.src, alt: el.alt });
+        let index = 0;
+
+        if (slides.length < 2) gallery.classList.add('is-single');
+
+        const dots = [];
+        if (slides.length > 1 && dotsWrap) {
+            slides.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'carousel-dot' + (i === 0 ? ' is-active' : '');
+                dot.setAttribute('aria-label', `Go to image ${i + 1}`);
+                dot.addEventListener('click', () => goTo(i));
+                dotsWrap.appendChild(dot);
+                dots.push(dot);
+            });
+        }
+
+        function update() {
+            track.style.transform = `translateX(-${index * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('is-active', i === index));
+            if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
+        }
+
+        function goTo(i) {
+            index = (i + slides.length) % slides.length;
+            update();
+        }
+
+        if (prev) prev.addEventListener('click', () => goTo(index - 1));
+        if (next) next.addEventListener('click', () => goTo(index + 1));
+        if (zoomBtn) zoomBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openLightbox(images, index);
+        });
+
+        // Tap to open lightbox, horizontal drag to change slide
+        let down = false, downX = 0, downY = 0, moved = 0;
+        track.addEventListener('pointerdown', (e) => {
+            down = true; downX = e.clientX; downY = e.clientY; moved = 0;
+        });
+        track.addEventListener('pointermove', (e) => {
+            if (!down) return;
+            moved = Math.max(moved, Math.abs(e.clientX - downX));
+        });
+        track.addEventListener('pointerup', (e) => {
+            if (!down) return;
+            down = false;
+            const dx = e.clientX - downX;
+            if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(e.clientY - downY)) {
+                goTo(index + (dx < 0 ? 1 : -1));
+            } else if (moved < 8) {
+                openLightbox(images, index);
+            }
+        });
+
+        update();
+    });
+})();
+
 console.log('%c✦ Maruf Ahmed Portfolio ✦', 'color: #6c63ff; font-size: 16px; font-weight: bold;');
 console.log('%cBuilt with passion 🚀', 'color: #8b8b96; font-size: 12px;');

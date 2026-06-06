@@ -1632,7 +1632,7 @@ button {
     border-color: var(--accent);
 }
 
-/* Project Image */
+/* Project Image / Carousel */
 .project-image {
     position: relative;
     z-index: 2;
@@ -1640,25 +1640,188 @@ button {
     overflow: hidden;
     margin-bottom: 20px;
     border: 1px solid var(--border);
-    max-height: 200px;
+    height: 220px;
 }
 
 .project-card-featured .project-image {
-    max-height: 240px;
+    height: 300px;
 }
 
-.project-image img {
+.carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.6s var(--ease-out-expo);
+    will-change: transform;
+}
+
+.project-image img,
+.project-image video {
+    flex: 0 0 100%;
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.6s var(--ease-out-expo), filter 0.4s ease;
-    filter: brightness(0.85);
+    filter: brightness(0.82);
+    transition: filter 0.4s ease;
+    cursor: zoom-in;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
-.project-card:hover .project-image img {
-    transform: scale(1.05);
+.project-image video {
+    cursor: pointer;
+    background: #000;
+}
+
+.project-card:hover .project-image img,
+.project-card:hover .project-image video {
     filter: brightness(1);
+}
+
+/* Bottom gradient scrim so dots/counter stay legible */
+.project-image[data-gallery]::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 45%;
+    background: linear-gradient(to top, rgba(10, 10, 11, 0.6), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 3;
+}
+
+.project-image[data-gallery]:hover::after {
+    opacity: 1;
+}
+
+.project-image.is-single::after {
+    display: none;
+}
+
+/* Carousel arrows */
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--border-hover);
+    background: rgba(10, 10, 11, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+}
+
+.carousel-arrow--prev { left: 12px; }
+.carousel-arrow--next { right: 12px; }
+
+.project-image:hover .carousel-arrow { opacity: 1; }
+
+.carousel-arrow:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+/* Zoom button */
+.carousel-zoom {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid var(--border-hover);
+    background: rgba(10, 10, 11, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text);
+    cursor: zoom-in;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.project-image:hover .carousel-zoom { opacity: 1; }
+
+.carousel-zoom:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+/* Dots */
+.carousel-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 7px;
+    z-index: 4;
+}
+
+.carousel-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: width 0.3s ease, background 0.3s ease, border-radius 0.3s ease;
+}
+
+.carousel-dot.is-active {
+    width: 20px;
+    border-radius: 4px;
+    background: var(--accent-light);
+}
+
+/* Counter pill */
+.carousel-count {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--text);
+    background: rgba(10, 10, 11, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 3px 9px;
+    border-radius: 20px;
+    z-index: 4;
+}
+
+/* Single-image galleries: hide carousel chrome, keep zoom */
+.project-image.is-single .carousel-arrow,
+.project-image.is-single .carousel-dots,
+.project-image.is-single .carousel-count {
+    display: none;
+}
+
+/* Touch devices have no hover — keep controls visible */
+@media (hover: none) {
+    .carousel-arrow,
+    .carousel-zoom {
+        opacity: 1;
+    }
 }
 
 /* Project Links */
@@ -2159,4 +2322,184 @@ html.lenis body {
 
 .lenis.lenis-smooth [data-lenis-prevent] {
     overscroll-behavior: contain;
+}
+
+/* ==================== LIGHTBOX ==================== */
+body.lightbox-open {
+    overflow: hidden;
+}
+
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 5, 7, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.lightbox-stage {
+    position: relative;
+    z-index: 2;
+    width: min(92vw, 1400px);
+    height: 86vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+}
+
+.lightbox-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    transform: translate(0, 0) scale(1);
+    transform-origin: center center;
+    transition: transform 0.25s var(--ease-out-quart);
+    cursor: zoom-in;
+    user-select: none;
+    -webkit-user-drag: none;
+    will-change: transform;
+}
+
+.lightbox-img.is-zoomed {
+    cursor: grab;
+    transition: none;
+}
+
+.lightbox-img.is-panning {
+    cursor: grabbing;
+}
+
+.lightbox-video {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    background: #000;
+    display: none;
+}
+
+/* Toggle between image and video viewers */
+.lightbox.is-video .lightbox-img {
+    display: none;
+}
+
+.lightbox.is-video .lightbox-video {
+    display: block;
+}
+
+.lightbox.is-video .lightbox-hint {
+    display: none;
+}
+
+.lightbox-close,
+.lightbox-nav {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-hover);
+    background: rgba(20, 20, 26, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text);
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.lightbox-close {
+    top: 24px;
+    right: 24px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    font-size: 28px;
+}
+
+.lightbox-nav {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    font-size: 30px;
+}
+
+.lightbox-nav--prev { left: 24px; }
+.lightbox-nav--next { right: 24px; }
+
+.lightbox-close:hover,
+.lightbox-nav:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.lightbox-nav:hover {
+    transform: translateY(-50%) scale(1.08);
+}
+
+.lightbox.is-single .lightbox-nav {
+    display: none;
+}
+
+.lightbox-bar {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: rgba(20, 20, 26, 0.6);
+    border: 1px solid var(--border);
+    padding: 8px 18px;
+    border-radius: 30px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    white-space: nowrap;
+}
+
+.lightbox-counter {
+    color: var(--text);
+    letter-spacing: 1px;
+}
+
+.lightbox-hint {
+    color: var(--text-muted);
+}
+
+@media (max-width: 600px) {
+    .lightbox-stage { height: 80vh; }
+    .lightbox-hint { display: none; }
+    .lightbox-close { top: 16px; right: 16px; width: 42px; height: 42px; }
+    .lightbox-nav { width: 44px; height: 44px; font-size: 26px; }
+    .lightbox-nav--prev { left: 10px; }
+    .lightbox-nav--next { right: 10px; }
 }

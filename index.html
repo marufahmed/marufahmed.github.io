@@ -546,18 +546,31 @@
                 <!-- Project 1: RMG QA/QC Platform -->
                 <div class="project-card project-card-featured">
                     <div class="project-card-bg"></div>
-                    <div class="project-image">
-                        <img src="assets/images/argus.png" alt="Argus - Automated RMG QA/QC Platform" loading="lazy">
+                    <div class="project-image" data-gallery>
+                        <div class="carousel-track">
+                            <video src="assets/images/argus-video.mp4" autoplay muted loop playsinline preload="metadata" data-poster="assets/images/argus.png"></video>
+                            <img src="assets/images/argus.png" alt="Argus - Automated RMG QA/QC Platform" loading="lazy">
+                            <img src="assets/images/argus-2.png" alt="Argus - 3D measurement scan" loading="lazy">
+                            <img src="assets/images/argus-3.png" alt="Argus - measurement results" loading="lazy">
+                            <img src="assets/images/argus-4.png" alt="Argus - hardware unit" loading="lazy">
+                        </div>
+                        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous image">‹</button>
+                        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next image">›</button>
+                        <button class="carousel-zoom" type="button" aria-label="Zoom image">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        </button>
+                        <div class="carousel-dots" aria-hidden="true"></div>
+                        <span class="carousel-count" aria-hidden="true"></span>
                     </div>
                     <div class="project-number">01</div>
                     <div class="project-info">
                         <span class="project-category">AI / Edge Computing / IoT</span>
                         <h3 class="project-title">Automated RMG QA/QC Platform</h3>
                         <p class="project-desc">
-                            World's first AI-powered garment quality control system using LiDAR + Raspberry Pi. 
-                            Achieved 82% inference time reduction (4.5s → 0.8s) with Nvidia Triton + TensorRT. 
+                            World's first AI-powered garment measurement system using Structured Light 3D sensing. 
+                            Achieved 82% inference time reduction (4.5s → 0.8s) with Nvidia Triton + TensorRT. 93.5% accuracy in measrurement compared to human inspectors.  
                             Novel finetuning methods using vector embeddings with positional encoding for subpixel 
-                            accuracy. 50+ units backordered before launch, validated by BGMEA board members.
+                            accuracy. 10+ units backordered before launch, validated by BGMEA board members.
                         </p>
                         <div class="project-tech">
                             <span>Python</span><span>TensorRT</span><span>Triton</span><span>LiDAR</span><span>React</span><span>Redis</span>
@@ -566,13 +579,170 @@
                     <div class="project-accent"></div>
                 </div>
 
-                <!-- Project 2: RAG Pipeline -->
-                <div class="project-card">
+                <!-- Project 2: Bloomridge Springs -->
+                <div class="project-card project-card-featured">
                     <div class="project-card-bg"></div>
-                    <div class="project-image">
-                        <img src="assets/images/melody.png" alt="Melody RAG Architecture" loading="lazy">
+                    <div class="project-image" data-gallery>
+                        <div class="carousel-track">
+                            <img src="assets/images/bloomridge-0.png" alt="Bloomridge Springs - dashboard" loading="lazy">
+                            <img src="assets/images/bloomridge-1.png" alt="Bloomridge Springs - scheduling solver" loading="lazy">
+                            <img src="assets/images/bloomridge-2.png" alt="Bloomridge Springs - agentic assistant" loading="lazy">
+                            <img src="assets/images/bloomridge-3.png" alt="Bloomridge Springs - IEP documents" loading="lazy">
+                            <img src="assets/images/bloomridge-4.png" alt="Bloomridge Springs - SMART goals" loading="lazy">
+                            <img src="assets/images/bloomridge-5.png" alt="Bloomridge Springs - progress reporting" loading="lazy">
+                            <img src="assets/images/bloomridge-6.png" alt="Bloomridge Springs - therapist view" loading="lazy">
+                            <img src="assets/images/bloomridge-7.png" alt="Bloomridge Springs - notifications" loading="lazy">
+                        </div>
+                        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous image">‹</button>
+                        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next image">›</button>
+                        <button class="carousel-zoom" type="button" aria-label="Zoom image">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        </button>
+                        <div class="carousel-dots" aria-hidden="true"></div>
+                        <span class="carousel-count" aria-hidden="true"></span>
                     </div>
                     <div class="project-number">02</div>
+                    <div class="project-info">
+                        <span class="project-category">Constraint Optimization / Agentic AI / Healthcare</span>
+                        <h3 class="project-title">AI-Native Special-Education Operations Platform</h3>
+                        <p class="project-desc">
+                            Multi-tenant platform that runs the clinical and operational backbone of a special-needs school and
+                            therapy center. At its core is a <strong>Google OR-Tools CP-SAT constraint solver</strong> that models
+                            weekly scheduling as a CSP — encoding therapist availability, time-off, room capacity and no-double-booking
+                            as hard constraints, then maximizing booked sessions with a weighted objective that rewards each student's
+                            preferred slots. On top sits an <strong>agentic manager assistant</strong> (Groq Llama-Scout 17B with 30+
+                            function-calling tools) governed by role-based tool access and a <strong>human-in-the-loop approval gate</strong>
+                            for any write that touches clinical data. A guarded AI-drafting pipeline generates versioned, Pydantic-validated
+                            <strong>IEP documents and SMART goals</strong> from assessment evidence, while Celery + APScheduler power
+                            progress evaluation and automated monthly reporting. Impact: weekly scheduling that took staff
+                            <strong>6–7 hours a day</strong> of manual matching and messaging now solves in <strong>2–3 seconds</strong>,
+                            session notifications fire automatically over WhatsApp, and agentic documentation eliminates hours of
+                            clinical paperwork — all observable via Sentry APM.
+                        </p>
+                        <div class="project-tech">
+                            <span>OR-Tools CP-SAT</span><span>Groq / LLM Agents</span><span>FastAPI</span><span>Celery</span><span>React + TS</span><span>PostgreSQL</span>
+                        </div>
+                    </div>
+                    <div class="project-accent"></div>
+                </div>
+
+                <!-- Project 3: SwiftFit -->
+                <div class="project-card project-card-featured">
+                    <div class="project-card-bg"></div>
+                    <div class="project-image" data-gallery>
+                        <div class="carousel-track">
+                            <img src="assets/images/swiftfit-1.png" alt="SwiftFit - 3D body reconstruction" loading="lazy">
+                            <img src="assets/images/swiftfit-2.png" alt="SwiftFit - size recommendation" loading="lazy">
+                        </div>
+                        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous image">‹</button>
+                        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next image">›</button>
+                        <button class="carousel-zoom" type="button" aria-label="Zoom image">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        </button>
+                        <div class="carousel-dots" aria-hidden="true"></div>
+                        <span class="carousel-count" aria-hidden="true"></span>
+                    </div>
+                    <div class="project-number">03</div>
+                    <div class="project-info">
+                        <span class="project-category">3D Computer Vision / Generative Reconstruction / ML</span>
+                        <h3 class="project-title">SwiftFit — 3D Body Measurement from Photos</h3>
+                        <p class="project-desc">
+                            Reconstructs a metric-accurate 3D human body from a handful of phone photos and turns it into clothing-size
+                            recommendations. I engineered <strong>MExECON</strong>, a multi-view extension of the ECON pipeline that fits a
+                            parametric <strong>SMPL-X</strong> body across viewpoints via <strong>Joint Multi-view Body Optimization (JMBO)</strong>,
+                            predicts clothed surface normals, and recovers fine geometry through <strong>bilateral normal integration</strong>
+                            with Poisson mesh fusion — orchestrating PIXIE, PyMAF-X and Sapiens under one CUDA inference graph. The FastAPI
+                            backend streams live pipeline progress over WebSocket to an interactive <strong>React Three Fiber</strong> viewer;
+                            height calibration scales the mesh to real-world circumferences, and a Crawl4AI + Groq-LLM engine scrapes any
+                            retailer's size chart to recommend the correct fit. Currently reaching <strong>83.4% reconstruction
+                            accuracy</strong>, with active research pushing it higher.
+                        </p>
+                        <div class="project-tech">
+                            <span>PyTorch</span><span>SMPL-X / BNI</span><span>React Three Fiber</span><span>CUDA</span><span>FastAPI</span><span>Crawl4AI + Groq</span>
+                        </div>
+                    </div>
+                    <div class="project-accent"></div>
+                </div>
+
+                <!-- Project 4: SwiftWallet -->
+                <div class="project-card">
+                    <div class="project-card-bg"></div>
+                    <div class="project-image" data-gallery>
+                        <div class="carousel-track">
+                            <img src="assets/images/swiftwallet-1.png" alt="SwiftWallet - receipt intelligence" loading="lazy">
+                            <img src="assets/images/swiftwallet-2.png" alt="SwiftWallet - finance dashboard" loading="lazy">
+                        </div>
+                        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous image">‹</button>
+                        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next image">›</button>
+                        <button class="carousel-zoom" type="button" aria-label="Zoom image">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        </button>
+                        <div class="carousel-dots" aria-hidden="true"></div>
+                        <span class="carousel-count" aria-hidden="true"></span>
+                    </div>
+                    <div class="project-number">04</div>
+                    <div class="project-info">
+                        <span class="project-category">Applied AI / FinTech / Document Intelligence</span>
+                        <h3 class="project-title">SwiftWallet — AI Finance Intelligence</h3>
+                        <p class="project-desc">
+                            Personal-finance platform that converts receipt photos and bank statements into structured, categorized
+                            transactions with zero manual entry. Built a two-stage document-intelligence pipeline — a GPU vision-OCR model
+                            (Transformers / PyTorch) extracts raw text at <strong>99.2% accuracy</strong>, then a <strong>Groq-hosted
+                            Llama-4 LLM</strong> parses merchant, totals and line items into a strict schema and classifies each against
+                            the user's own categories. The full
+                            <em>image → OCR → categorize → expense</em> flow runs asynchronously on <strong>Celery workers</strong> (monitored
+                            via Flower) so uploads never block the UI, and an <strong>agentic chat layer</strong> with function-calling tools
+                            lets users query their finances in natural language. Async SQLAlchemy + Alembic migrations, Supabase JWT (ES256)
+                            auth, and a fully containerized Next.js + FastAPI + Postgres + Redis stack.
+                        </p>
+                        <div class="project-tech">
+                            <span>Next.js</span><span>Vision OCR</span><span>Groq LLM</span><span>Celery / Redis</span><span>FastAPI (async)</span><span>PostgreSQL</span>
+                        </div>
+                    </div>
+                    <div class="project-accent"></div>
+                </div>
+
+                <!-- Project 5: Bengali Voice Agent -->
+                <div class="project-card project-card-featured">
+                    <div class="project-card-bg"></div>
+                    <div class="project-number">05</div>
+                    <div class="project-info">
+                        <span class="project-category">Voice AI / Real-Time Agents / RAG</span>
+                        <h3 class="project-title">Real-Time Bengali Voice Agent</h3>
+                        <p class="project-desc">
+                            A full-duplex, voice-native assistant that books doctor appointments entirely in Bengali. I architected the
+                            voice loop as isolated microservices — <strong>GPU faster-whisper STT</strong> (with VAD-gated segmentation)
+                            → a <strong>Groq LLM tool-calling agent</strong> → edge-TTS — streamed over bidirectional WebSockets with
+                            <strong>barge-in / interrupt</strong> handling for natural turn-taking. The agent grounds its medical reasoning
+                            in a Bengali <strong>RAG knowledge base</strong> (ChromaDB + multilingual embeddings) to map symptoms to the
+                            right specialist, then drives six booking tools across 12 doctors with Redis-backed session memory. A live
+                            React dashboard visualizes the entire agent trace — transcription, LLM reasoning, tool execution and schedule
+                            updates — in real time, with the pipeline processing audio at <strong>219× real-time speed</strong> for
+                            near-instant spoken responses.
+                        </p>
+                        <div class="project-tech">
+                            <span>faster-whisper</span><span>Groq Tool-Calling</span><span>ChromaDB RAG</span><span>WebSocket / VAD</span><span>FastAPI</span><span>React</span>
+                        </div>
+                    </div>
+                    <div class="project-accent"></div>
+                </div>
+
+                <!-- Project 6: RAG Pipeline -->
+                <div class="project-card">
+                    <div class="project-card-bg"></div>
+                    <div class="project-image" data-gallery>
+                        <div class="carousel-track">
+                            <img src="assets/images/melody.png" alt="Melody RAG Architecture" loading="lazy">
+                        </div>
+                        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous image">‹</button>
+                        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next image">›</button>
+                        <button class="carousel-zoom" type="button" aria-label="Zoom image">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        </button>
+                        <div class="carousel-dots" aria-hidden="true"></div>
+                        <span class="carousel-count" aria-hidden="true"></span>
+                    </div>
+                    <div class="project-number">06</div>
                     <div class="project-info">
                         <span class="project-category">AI / NLP / Backend</span>
                         <h3 class="project-title">Melody — RAG Chat Assistant</h3>
@@ -590,13 +760,23 @@
                     </div>
                 </div>
 
-                <!-- Project 3: MLOps Platform -->
+                <!-- Project 7: MLOps Platform -->
                 <div class="project-card">
                     <div class="project-card-bg"></div>
-                    <div class="project-image">
-                        <img src="assets/images/mlops-pipeline.png" alt="GPU-on-Demand MLOps Platform" loading="lazy">
+                    <div class="project-image" data-gallery>
+                        <div class="carousel-track">
+                            <img src="assets/images/mlops-pipeline.png" alt="GPU-on-Demand MLOps Platform - architecture" loading="lazy">
+                            <img src="assets/images/mlops-pipeline-1.png" alt="GPU-on-Demand MLOps Platform - provisioning" loading="lazy">
+                        </div>
+                        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous image">‹</button>
+                        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next image">›</button>
+                        <button class="carousel-zoom" type="button" aria-label="Zoom image">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        </button>
+                        <div class="carousel-dots" aria-hidden="true"></div>
+                        <span class="carousel-count" aria-hidden="true"></span>
                     </div>
-                    <div class="project-number">03</div>
+                    <div class="project-number">07</div>
                     <div class="project-info">
                         <span class="project-category">MLOps / Cloud / Infrastructure</span>
                         <h3 class="project-title">GPU-on-Demand MLOps Platform</h3>
@@ -611,13 +791,22 @@
                     </div>
                 </div>
 
-                <!-- Project 4: Bengali OCR -->
+                <!-- Project 8: Bengali OCR -->
                 <div class="project-card">
                     <div class="project-card-bg"></div>
-                    <div class="project-image">
-                        <img src="assets/images/ocr-system.jpg" alt="Bengali OCR System" loading="lazy">
+                    <div class="project-image" data-gallery>
+                        <div class="carousel-track">
+                            <img src="assets/images/ocr-system.jpg" alt="Bengali OCR System" loading="lazy">
+                        </div>
+                        <button class="carousel-arrow carousel-arrow--prev" type="button" aria-label="Previous image">‹</button>
+                        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next image">›</button>
+                        <button class="carousel-zoom" type="button" aria-label="Zoom image">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                        </button>
+                        <div class="carousel-dots" aria-hidden="true"></div>
+                        <span class="carousel-count" aria-hidden="true"></span>
                     </div>
-                    <div class="project-number">04</div>
+                    <div class="project-number">08</div>
                     <div class="project-info">
                         <span class="project-category">Computer Vision / NLP</span>
                         <h3 class="project-title">Bengali OCR System</h3>
@@ -635,10 +824,10 @@
                     </div>
                 </div>
 
-                <!-- Project 5: Pavement Crack Detection -->
+                <!-- Project 9: Pavement Crack Detection -->
                 <div class="project-card">
                     <div class="project-card-bg"></div>
-                    <div class="project-number">05</div>
+                    <div class="project-number">09</div>
                     <div class="project-info">
                         <span class="project-category">Research / Autonomous Systems</span>
                         <h3 class="project-title">Smart Pavement Crack Detection</h3>
@@ -781,6 +970,22 @@
             </div>
         </div>
     </footer>
+
+    <!-- ==================== LIGHTBOX ==================== -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" aria-hidden="true">
+        <div class="lightbox-backdrop"></div>
+        <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+        <button class="lightbox-nav lightbox-nav--prev" type="button" aria-label="Previous image">‹</button>
+        <button class="lightbox-nav lightbox-nav--next" type="button" aria-label="Next image">›</button>
+        <div class="lightbox-stage">
+            <img class="lightbox-img" src="" alt="" draggable="false">
+            <video class="lightbox-video" controls playsinline></video>
+        </div>
+        <div class="lightbox-bar">
+            <span class="lightbox-counter"></span>
+            <span class="lightbox-hint">Scroll or click to zoom · drag to pan · Esc to close</span>
+        </div>
+    </div>
 
     <!-- ==================== SCRIPTS ==================== -->
     <!-- GSAP (Free CDN) -->
