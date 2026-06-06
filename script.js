@@ -1339,5 +1339,22 @@ function initTypingEffect() {
     }
 })();
 
+// ==================== SITE VISITOR COUNT (GoatCounter) ====================
+(function visitorCount() {
+    const el = document.getElementById('siteVisitors');
+    if (!el) return;
+    fetch('https://marufahmed.goatcounter.com/counter/TOTAL.json')
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then((data) => {
+            const num = el.querySelector('.visitor-num');
+            const value = data.count_unique || data.count;
+            if (num && value) {
+                num.textContent = value;
+                el.hidden = false;
+            }
+        })
+        .catch(() => { /* leave the stat hidden if the counter isn't available */ });
+})();
+
 console.log('%c✦ Maruf Ahmed Portfolio ✦', 'color: #6c63ff; font-size: 16px; font-weight: bold;');
 console.log('%cBuilt with passion 🚀', 'color: #8b8b96; font-size: 12px;');

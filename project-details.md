@@ -67,33 +67,7 @@ the paperwork, and keeps parents informed automatically:
 
 ---
 
-## 03 · SwiftFit — 3D Body Measurement from Photos
-
-**The problem.** Online clothing returns are overwhelmingly a *sizing* problem. Existing
-"measure yourself" flows ask people to wrap a tape measure correctly — which they don't — or
-need depth sensors most phones lack.
-
-**What it solves.** Upload a few ordinary photos, enter your height, and SwiftFit reconstructs
-a metric-accurate **3D body model**, reads real circumferences and lengths off it, and maps
-those to the correct size for any retailer's chart.
-
-**Challenges & how we overcame them.**
-
-- *Single-image body reconstruction is unstable across angles.* We extended the ECON pipeline
-  into **MExECON**, fusing multiple views through **Joint Multi-view Body Optimization (JMBO)**
-  so one consistent SMPL-X body explains every photo — far more robust than per-image guesses.
-- *A parametric body is smooth; real bodies have surface detail.* We predict clothed surface
-  normals and recover fine geometry with **bilateral normal integration** and Poisson fusion,
-  orchestrating PIXIE, PyMAF-X and Sapiens under a single CUDA inference graph.
-- *Heavy GPU inference feels broken if the user just stares at a spinner.* The FastAPI backend
-  streams live pipeline progress over WebSocket into an interactive **React Three Fiber**
-  viewer — the user watches their model build, step by step.
-- **Where it stands:** **83.4% reconstruction accuracy** today, with active research pushing
-  it higher.
-
----
-
-## 04 · SwiftWallet — AI Finance Intelligence
+## 03 · SwiftWallet — AI Finance Intelligence
 
 **The problem.** Personal budgeting dies on data entry. Nobody types in receipts, so spending
 data is always stale and incomplete — and bank statements arrive as messy PDFs.
@@ -116,6 +90,32 @@ money in plain language.
 - *Querying your finances should feel like a conversation.* An agentic chat layer with
   function-calling tools answers "how much did I spend on groceries last month?" directly
   against the user's data.
+
+---
+
+## 04 · SwiftFit — 3D Body Measurement from Photos
+
+**The problem.** Online clothing returns are overwhelmingly a *sizing* problem. Existing
+"measure yourself" flows ask people to wrap a tape measure correctly — which they don't — or
+need depth sensors most phones lack.
+
+**What it solves.** Upload a few ordinary photos, enter your height, and SwiftFit reconstructs
+a metric-accurate **3D body model**, reads real circumferences and lengths off it, and maps
+those to the correct size for any retailer's chart.
+
+**Challenges & how we overcame them.**
+
+- *Single-image body reconstruction is unstable across angles.* We extended the ECON pipeline
+  into **MExECON**, fusing multiple views through **Joint Multi-view Body Optimization (JMBO)**
+  so one consistent SMPL-X body explains every photo — far more robust than per-image guesses.
+- *A parametric body is smooth; real bodies have surface detail.* We predict clothed surface
+  normals and recover fine geometry with **bilateral normal integration** and Poisson fusion,
+  orchestrating PIXIE, PyMAF-X and Sapiens under a single CUDA inference graph.
+- *Heavy GPU inference feels broken if the user just stares at a spinner.* The FastAPI backend
+  streams live pipeline progress over WebSocket into an interactive **React Three Fiber**
+  viewer — the user watches their model build, step by step.
+- **Where it stands:** **83.4% reconstruction accuracy** today, with active research pushing
+  it higher.
 
 ---
 
