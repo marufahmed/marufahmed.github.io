@@ -7,9 +7,6 @@ across edge computing, computer vision, and agentic AI.
 
 ![Repo views](https://visitor-badge.laobi.icu/badge?page_id=marufahmed.marufahmed.github.io)
 
-> ⚠️ **Note:** the badge above counts **README / repository views on GitHub** — *not*
-> visits to the live website. See [Tracking real site visitors](#tracking-real-site-visitors)
-> for how to measure actual traffic to the deployed page.
 
 ---
 
@@ -84,24 +81,5 @@ python3 -m http.server 8000
 
 ---
 
-## Tracking real site visitors
 
-To count actual visits to `marufahmed.github.io`, add a small analytics script to
-`index.html` (a README badge can't do this). Privacy-friendly, free options:
-
-- **[GoatCounter](https://www.goatcounter.com/)** — easiest for a personal site. Register a
-  free account, then add one line before `</body>`:
-  ```html
-  <script data-goatcounter="https://YOURCODE.goatcounter.com/count"
-          async src="//gc.zgo.at/count.js"></script>
-  ```
-- **[Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/)** — free, no
-  cookies; paste the provided beacon snippet into `index.html`.
-- **Google Analytics 4** — free and detailed, but uses cookies (needs a consent notice in
-  many regions).
-
-Once you have a code/token from any of the above, drop it in and I'll wire it into the page.
-
----
-
-© 2025 Maruf Ahmed
+© 2026 Maruf Ahmed
