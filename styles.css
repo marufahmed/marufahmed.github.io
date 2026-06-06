@@ -1641,6 +1641,7 @@ button {
     margin-bottom: 20px;
     border: 1px solid var(--border);
     height: 220px;
+    background: #0d0d10;
 }
 
 .project-card-featured .project-image {
@@ -1650,6 +1651,7 @@ button {
 .carousel-track {
     display: flex;
     height: 100%;
+    align-items: flex-start;
     transition: transform 0.6s var(--ease-out-expo);
     will-change: transform;
 }
@@ -1658,24 +1660,56 @@ button {
 .project-image video {
     flex: 0 0 100%;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
     display: block;
     filter: brightness(0.82);
     transition: filter 0.4s ease;
-    cursor: zoom-in;
+    cursor: pointer;
     user-select: none;
     -webkit-user-drag: none;
 }
 
+/* Images keep natural height so the slideshow can pan top -> bottom */
+.project-image img {
+    height: auto;
+    will-change: transform;
+}
+
 .project-image video {
-    cursor: pointer;
+    height: 100%;
+    object-fit: cover;
     background: #000;
 }
 
 .project-card:hover .project-image img,
 .project-card:hover .project-image video {
     filter: brightness(1);
+}
+
+/* Popup owns zoom now — hide the per-card magnifier */
+.project-image .carousel-zoom {
+    display: none;
+}
+
+/* Whole card opens the deep-dive popup */
+.project-card {
+    cursor: pointer;
+}
+
+.project-open-hint {
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.8;
+    transition: gap 0.3s ease, opacity 0.3s ease;
+}
+
+.project-card:hover .project-open-hint {
+    opacity: 1;
+    gap: 11px;
 }
 
 /* Bottom gradient scrim so dots/counter stay legible */
@@ -2502,4 +2536,241 @@ body.lightbox-open {
     .lightbox-nav { width: 44px; height: 44px; font-size: 26px; }
     .lightbox-nav--prev { left: 10px; }
     .lightbox-nav--next { right: 10px; }
+}
+
+/* ==================== PROJECT DEEP-DIVE MODAL ==================== */
+body.modal-open {
+    overflow: hidden;
+}
+
+.project-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.project-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.project-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 5, 7, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.project-modal-panel {
+    position: relative;
+    z-index: 2;
+    width: min(1100px, 96vw);
+    max-height: 92vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+    transform: translateY(16px) scale(0.98);
+    transition: transform 0.4s var(--ease-out-expo);
+}
+
+.project-modal.is-open .project-modal-panel {
+    transform: translateY(0) scale(1);
+}
+
+.project-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border-hover);
+    background: rgba(10, 10, 11, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.project-modal-close:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+/* Media / gallery column */
+.project-modal-media {
+    background: #0d0d10;
+    overflow-y: auto;
+    max-height: 92vh;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.project-modal-media img,
+.project-modal-media video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.project-modal-media img {
+    cursor: zoom-in;
+    transition: border-color 0.3s ease;
+}
+
+.project-modal-media img:hover {
+    border-color: var(--accent);
+}
+
+.project-modal-media video {
+    background: #000;
+}
+
+.project-modal-media-empty {
+    margin: auto;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* Notes column */
+.project-modal-body {
+    padding: 44px 38px;
+    overflow-y: auto;
+    max-height: 92vh;
+}
+
+.project-modal-num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--accent);
+}
+
+.project-modal-category {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 6px 0 10px;
+}
+
+.project-modal-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 24px;
+}
+
+.project-modal-notes p {
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.project-modal-notes strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.project-modal-notes em {
+    color: var(--text);
+    font-style: italic;
+}
+
+.project-modal-notes h4 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 24px 0 14px;
+}
+
+.project-modal-notes ul.dd-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.project-modal-notes ul.dd-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.project-modal-notes ul.dd-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.project-modal-notes code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--accent-light);
+    background: var(--bg-tertiary);
+    padding: 1px 6px;
+    border-radius: 5px;
+}
+
+@media (max-width: 820px) {
+    .project-modal-panel {
+        grid-template-columns: 1fr;
+        max-height: 94vh;
+    }
+
+    .project-modal-media {
+        max-height: 36vh;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .project-modal-media img,
+    .project-modal-media video {
+        width: auto;
+        height: 100%;
+    }
+
+    .project-modal-body {
+        max-height: none;
+        padding: 30px 22px;
+    }
 }

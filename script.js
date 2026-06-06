@@ -950,6 +950,15 @@ function initTypingEffect() {
     let tx = 0, ty = 0;
     let startTx = 0, startTy = 0;
 
+    // Slideshow autoplay <-> overlay coordination
+    const galleries = [];
+    let modalOpen = false, lightboxOpen = false, interactionPaused = false;
+
+    function syncPause() {
+        interactionPaused = modalOpen || lightboxOpen;
+        galleries.forEach((g) => (interactionPaused ? g.pause() : g.resume()));
+    }
+
     function applyTransform() {
         lbImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
     }
@@ -1008,6 +1017,8 @@ function initTypingEffect() {
         lightbox.classList.add('is-open');
         lightbox.setAttribute('aria-hidden', 'false');
         document.body.classList.add('lightbox-open');
+        lightboxOpen = true;
+        syncPause();
         showImage(index);
     }
 
@@ -1016,6 +1027,8 @@ function initTypingEffect() {
         lightbox.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('lightbox-open');
         lbVideo.pause();
+        lightboxOpen = false;
+        syncPause();
     }
 
     // Lightbox controls
@@ -1026,9 +1039,9 @@ function initTypingEffect() {
 
     document.addEventListener('keydown', (e) => {
         if (!lightbox.classList.contains('is-open')) return;
-        if (e.key === 'Escape') closeLightbox();
-        else if (e.key === 'ArrowRight') showImage(lbIndex + 1);
-        else if (e.key === 'ArrowLeft') showImage(lbIndex - 1);
+        if (e.key === 'Escape') { closeLightbox(); e.stopImmediatePropagation(); }
+        else if (e.key === 'ArrowRight') { showImage(lbIndex + 1); e.stopImmediatePropagation(); }
+        else if (e.key === 'ArrowLeft') { showImage(lbIndex - 1); e.stopImmediatePropagation(); }
     });
 
     // Wheel to zoom
@@ -1076,7 +1089,11 @@ function initTypingEffect() {
         else lbImg.style.transition = EASE;
     });
 
-    // Wire each project gallery
+    // ---- Auto-playing slideshow galleries (vertical pan reveal) ----
+    const HOLD = 900;           // ms held at top and bottom of a pan
+    const PAN_PX_PER_SEC = 70;  // vertical pan speed
+    const FIT_DWELL = 3200;     // ms dwell when an image has nothing to pan
+
     document.querySelectorAll('[data-gallery]').forEach((gallery) => {
         const track = gallery.querySelector('.carousel-track');
         const slides = Array.from(track.children).filter((el) => el.tagName === 'IMG' || el.tagName === 'VIDEO');
@@ -1084,69 +1101,242 @@ function initTypingEffect() {
 
         const prev = gallery.querySelector('.carousel-arrow--prev');
         const next = gallery.querySelector('.carousel-arrow--next');
-        const zoomBtn = gallery.querySelector('.carousel-zoom');
         const dotsWrap = gallery.querySelector('.carousel-dots');
         const counter = gallery.querySelector('.carousel-count');
-        const images = slides.map((el) => el.tagName === 'VIDEO'
-            ? { type: 'video', src: el.currentSrc || el.src }
-            : { type: 'image', src: el.src, alt: el.alt });
-        let index = 0;
+        const multi = slides.length > 1;
+        let index = 0, hovered = false, raf = null, phaseStart = 0, pausedAt = 0, currentOverflow = 0;
 
-        if (slides.length < 2) gallery.classList.add('is-single');
+        if (!multi) gallery.classList.add('is-single');
 
         const dots = [];
-        if (slides.length > 1 && dotsWrap) {
+        if (multi && dotsWrap) {
             slides.forEach((_, i) => {
                 const dot = document.createElement('button');
                 dot.type = 'button';
                 dot.className = 'carousel-dot' + (i === 0 ? ' is-active' : '');
-                dot.setAttribute('aria-label', `Go to image ${i + 1}`);
-                dot.addEventListener('click', () => goTo(i));
+                dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                dot.addEventListener('click', (e) => { e.stopPropagation(); manualGo(i); });
                 dotsWrap.appendChild(dot);
                 dots.push(dot);
             });
         }
 
-        function update() {
+        const currentEl = () => slides[index];
+
+        function setChrome() {
             track.style.transform = `translateX(-${index * 100}%)`;
             dots.forEach((d, i) => d.classList.toggle('is-active', i === index));
             if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
         }
 
-        function goTo(i) {
-            index = (i + slides.length) % slides.length;
-            update();
+        function measureCurrent() {
+            const el = currentEl();
+            currentOverflow = el.tagName === 'IMG'
+                ? Math.max(0, el.getBoundingClientRect().height - gallery.clientHeight)
+                : 0;
         }
 
-        if (prev) prev.addEventListener('click', () => goTo(index - 1));
-        if (next) next.addEventListener('click', () => goTo(index + 1));
-        if (zoomBtn) zoomBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openLightbox(images, index);
-        });
+        function startSlide() {
+            cancelAnimationFrame(raf);
+            raf = null;
+            slides.forEach((s) => { if (s.tagName === 'IMG') s.style.transform = 'translateY(0)'; });
+            setChrome();
+            const el = currentEl();
 
-        // Tap to open lightbox, horizontal drag to change slide
-        let down = false, downX = 0, downY = 0, moved = 0;
-        track.addEventListener('pointerdown', (e) => {
-            down = true; downX = e.clientX; downY = e.clientY; moved = 0;
-        });
-        track.addEventListener('pointermove', (e) => {
-            if (!down) return;
-            moved = Math.max(moved, Math.abs(e.clientX - downX));
-        });
+            if (el.tagName === 'VIDEO') {
+                el.loop = false;
+                el.currentTime = 0;
+                if (el._onEnded) el.removeEventListener('ended', el._onEnded);
+                el._onEnded = () => { el.removeEventListener('ended', el._onEnded); el._onEnded = null; advance(); };
+                el.addEventListener('ended', el._onEnded);
+                if (!interactionPaused && !hovered) el.play().catch(() => {});
+                return; // advances on 'ended' -> naturally a longer slide
+            }
+
+            measureCurrent();
+            if (!el.complete) {
+                el.addEventListener('load', () => {
+                    if (currentEl() === el) { measureCurrent(); phaseStart = performance.now(); }
+                }, { once: true });
+            }
+            phaseStart = performance.now();
+            if (!interactionPaused && !hovered) raf = requestAnimationFrame(panTick);
+        }
+
+        function panTick(now) {
+            const el = currentEl();
+            if (el.tagName !== 'IMG') return;
+            const panDur = currentOverflow > 0 ? Math.min(9000, (currentOverflow / PAN_PX_PER_SEC) * 1000) : 0;
+            const total = currentOverflow > 0 ? (HOLD + panDur + HOLD) : FIT_DWELL;
+            const elapsed = now - phaseStart;
+            if (currentOverflow > 0) {
+                let y;
+                if (elapsed <= HOLD) y = 0;
+                else if (elapsed >= HOLD + panDur) y = -currentOverflow;
+                else y = -currentOverflow * (elapsed - HOLD) / panDur;
+                el.style.transform = `translateY(${y}px)`;
+            }
+            if (elapsed >= total) { advance(); return; }
+            raf = requestAnimationFrame(panTick);
+        }
+
+        function advance() {
+            if (multi) index = (index + 1) % slides.length;
+            startSlide();
+        }
+
+        function manualGo(i) {
+            slides.forEach((s) => { if (s.tagName === 'VIDEO') s.pause(); });
+            index = (i + slides.length) % slides.length;
+            startSlide();
+        }
+
+        if (prev) prev.addEventListener('click', (e) => { e.stopPropagation(); manualGo(index - 1); });
+        if (next) next.addEventListener('click', (e) => { e.stopPropagation(); manualGo(index + 1); });
+
+        // Pause while the user hovers (to read / interact)
+        gallery.addEventListener('pointerenter', () => { hovered = true; pause(); });
+        gallery.addEventListener('pointerleave', () => { hovered = false; resume(); });
+
+        // Horizontal drag = change slide; a plain tap bubbles to the card (opens modal)
+        let down = false, downX = 0, downY = 0;
+        track.addEventListener('pointerdown', (e) => { down = true; downX = e.clientX; downY = e.clientY; });
         track.addEventListener('pointerup', (e) => {
             if (!down) return;
             down = false;
             const dx = e.clientX - downX;
-            if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(e.clientY - downY)) {
-                goTo(index + (dx < 0 ? 1 : -1));
-            } else if (moved < 8) {
-                openLightbox(images, index);
+            if (multi && Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(e.clientY - downY)) {
+                e.stopPropagation(); // a swipe, not a tap — don't open the modal
+                manualGo(index + (dx < 0 ? 1 : -1));
             }
         });
 
-        update();
+        function pause() {
+            cancelAnimationFrame(raf);
+            raf = null;
+            if (!pausedAt) pausedAt = performance.now();
+            slides.forEach((s) => { if (s.tagName === 'VIDEO') s.pause(); });
+        }
+
+        function resume() {
+            if (hovered || interactionPaused) return;
+            const el = currentEl();
+            if (el.tagName === 'VIDEO') { el.play().catch(() => {}); pausedAt = 0; return; }
+            if (pausedAt) { phaseStart += performance.now() - pausedAt; pausedAt = 0; }
+            if (raf == null) raf = requestAnimationFrame(panTick);
+        }
+
+        galleries.push({ pause, resume });
+        window.addEventListener('resize', measureCurrent);
+        startSlide();
     });
+
+    // ---- Project deep-dive modal ----
+    const modal = document.getElementById('projectModal');
+    if (modal) {
+        const modalClose = modal.querySelector('.project-modal-close');
+        const modalBackdrop = modal.querySelector('.project-modal-backdrop');
+        const modalMedia = modal.querySelector('.project-modal-media');
+        const modalNum = modal.querySelector('.project-modal-num');
+        const modalCategory = modal.querySelector('.project-modal-category');
+        const modalTitle = modal.querySelector('.project-modal-title');
+        const modalNotes = modal.querySelector('.project-modal-notes');
+
+        function buildModalMedia(card) {
+            modalMedia.innerHTML = '';
+            const gallery = card.querySelector('[data-gallery]');
+            const mediaEls = gallery
+                ? Array.from(gallery.querySelectorAll('.carousel-track > img, .carousel-track > video'))
+                : [];
+            const imgList = mediaEls
+                .filter((el) => el.tagName === 'IMG')
+                .map((el) => ({ type: 'image', src: el.src, alt: el.alt }));
+
+            mediaEls.forEach((el) => {
+                if (el.tagName === 'VIDEO') {
+                    const v = document.createElement('video');
+                    v.src = el.currentSrc || el.src;
+                    v.controls = true;
+                    v.playsInline = true;
+                    v.preload = 'metadata';
+                    modalMedia.appendChild(v);
+                } else {
+                    const im = document.createElement('img');
+                    im.src = el.src;
+                    im.alt = el.alt;
+                    im.loading = 'lazy';
+                    const li = Math.max(0, imgList.findIndex((x) => x.src === el.src));
+                    im.addEventListener('click', () => openLightbox(imgList, li));
+                    modalMedia.appendChild(im);
+                }
+            });
+
+            if (!modalMedia.children.length) {
+                const empty = document.createElement('div');
+                empty.className = 'project-modal-media-empty';
+                empty.textContent = 'No preview media for this project yet.';
+                modalMedia.appendChild(empty);
+            } else {
+                modalMedia.scrollTop = 0;
+            }
+        }
+
+        function openModal(card) {
+            const num = (card.querySelector('.project-number')?.textContent || '').trim();
+            modalNum.textContent = num ? `${num} —` : '';
+            modalCategory.textContent = card.querySelector('.project-category')?.textContent.trim() || '';
+            modalTitle.textContent = card.querySelector('.project-title')?.textContent.trim() || '';
+
+            const tpl = document.querySelector(`#deepdives template[data-project="${num}"]`);
+            modalNotes.innerHTML = '';
+            if (tpl) {
+                modalNotes.appendChild(tpl.content.cloneNode(true));
+            } else {
+                const p = document.createElement('p');
+                p.textContent = card.querySelector('.project-desc')?.textContent.trim() || '';
+                modalNotes.appendChild(p);
+            }
+            modalNotes.scrollTop = 0;
+
+            buildModalMedia(card);
+
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            modalOpen = true;
+            syncPause();
+        }
+
+        function closeModal() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+            modalMedia.querySelectorAll('video').forEach((v) => v.pause());
+            modalOpen = false;
+            syncPause();
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOpen) closeModal();
+        });
+
+        // Wire every project card: add affordance + open modal on click
+        document.querySelectorAll('.project-card').forEach((card) => {
+            const info = card.querySelector('.project-info');
+            if (info && !info.querySelector('.project-open-hint')) {
+                const hint = document.createElement('span');
+                hint.className = 'project-open-hint';
+                hint.innerHTML = 'View deep-dive <span aria-hidden="true">&rarr;</span>';
+                info.appendChild(hint);
+            }
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a, .carousel-arrow, .carousel-dot')) return;
+                openModal(card);
+            });
+        });
+    }
 })();
 
 console.log('%c✦ Maruf Ahmed Portfolio ✦', 'color: #6c63ff; font-size: 16px; font-weight: bold;');
