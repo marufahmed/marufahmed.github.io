@@ -37,6 +37,7 @@ gsap.registerPlugin(ScrollTrigger);
     if (window.innerWidth <= 768) return;
 
     const cursor = document.getElementById('cursor');
+    if (!cursor) return; // custom cursor removed — fall back to the standard pointer
     const dot = cursor.querySelector('.cursor-dot');
     const outline = cursor.querySelector('.cursor-outline');
 
